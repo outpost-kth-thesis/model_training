@@ -1,0 +1,11 @@
+# pyt
+torch
+vllm
+numpy
+huggingface_hub
+bitsandbytes
+trl
+peft
+accelerate
+transformers
+tokenizers

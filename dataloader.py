@@ -13,14 +13,14 @@ class OPKDataset(Dataset):
         self.root_dir = root_dir
 
         self._walk_root_directory()
-        self.train_files = self.all_files[0.8*len(self.all_files):]
-        self.val_files = self.all_files[:0.2*len(self.all_files)]
+        self.train_files = self.all_files[:int(0.8*len(self.all_files))]
+        self.val_files = self.all_files[-int(0.2*len(self.all_files)):]
         self.split = split
         
         super().__init__()
 
     def __len__(self):
-        return len(self.all_files)
+        return len(self.train_files) if self.split == "train" else len(self.val_files)
 
     def __getitem__(self, index):
         minified_filepath = self.train_files[index] if self.split == 'train' else self.val_files[index]
@@ -38,7 +38,5 @@ class OPKDataset(Dataset):
     def _walk_plaintext_directory(self):
         pass
 
-dt = OPKDataset("/home/praanto/Projects/outpost-thesis/obf-data/data_extracted")
-
-r = dt.__getitem__(3)
-print(r)
+dt = OPKDataset(split="train", root_dir="/home/jovyan/outpost-thesis/datasets/minified")
+print(len(dt))
