@@ -1,30 +1,54 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments
+from dataloader import OPKDataset
+from peft import LoraConfig
+from trl import SFTTrainer
+from torch.utils.data import random_split
 
-model = 'meta-llama/Llama-3.1-8B-Instruct'
+model_name = 'meta-llama/Llama-3.1-8B-Instruct'
 
-import accelerate
-from accelerate import *
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+dataset = OPKDataset("/home/jovyan/outpost-thesis/datasets/minified")
 
-tokenizer = AutoTokenizer.from_pretrained(model)
-model = AutoModelForCausalLM.from_pretrained(
-    model, device_map="auto"
+
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+
+train_set, val_set = random_split(dataset, [train_size, val_size])
+
+
+peft_config = LoraConfig(
+    r=16,
+    lora_alpha=16,
+    target_modules='all-linear',
+    lora_dropout=0.0,
+    bias="none",
+    task_type="CAUSAL_LM"
 )
 
-tag_msg = """<button aria-label="Mobile menu" class="mega-toggle-animated mega-toggle-animated-slider" type="button" aria-expanded="false">
-                  <span class="mega-toggle-animated-box">
-                    <span class="mega-toggle-animated-inner"></span>
-                  </span>
-                </button>
-"""
 
-messages = [
-    {
-        "role": "system",
-        "content": "You are a very proficient HTML developer and you can tell what a tag is for just by looking at it",
-    },
-    {"role": "user", "content": f"What is this tag for: {tag_msg}"},
-]
-model_inputs = tokenizer.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt").to("cuda")
-input_length = model_inputs.shape[1]
-generated_ids = model.generate(model_inputs, do_sample=True, max_new_tokens=2000)
-print(tokenizer.batch_decode(generated_ids[:, input_length:], skip_special_tokens=True)[0])
+training_arguments = TrainingArguments(
+    output_dir="logs",
+    num_train_epochs=5,
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=8,
+    save_steps=100,
+    logging_steps=25,
+    learning_rate=2e-4,
+    fp16=True,
+    evaluation_strategy="epoch",
+)
+
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=train_set,
+    eval_dataset=val_set,
+    peft_config=peft_config,
+    dataset_text_field="review",
+    tokenizer=tokenizer,
+    max_seq_length=512,
+    args=training_arguments,
+)
+trainer.train()
+
+print(tokenizer("hello world how do you do?"))
