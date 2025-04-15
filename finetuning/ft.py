@@ -1,9 +1,9 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Trainer, TrainingArguments, DataCollatorForSeq2Seq
-from finetuning.dataloader import OPKDataset
+from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForSeq2Seq
+from dataloader import OPKDataset
 
 model_name = 'meta-llama/Llama-3.1-8B'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
 dataset = OPKDataset()
 
@@ -29,7 +29,6 @@ training_args = TrainingArguments(
     num_train_epochs=3,
     logging_steps=10,
     save_strategy="epoch",
-    evaluation_strategy="no",
     save_total_limit=3,
     remove_unused_columns=False,
     fp16=True,
