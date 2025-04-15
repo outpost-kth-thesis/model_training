@@ -1,5 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Trainer, TrainingArguments, DataCollatorForSeq2Seq
-from dataloader import OPKDataset
+from finetuning.dataloader import OPKDataset
 
 model_name = 'meta-llama/Llama-3.1-8B'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -21,8 +21,6 @@ def preprocess(example):
     model_inputs["labels"] = labels["input_ids"]
     return model_inputs
 
-tokenized_dataset = dataset.map(preprocess, remove_columns=["input", "output"])
-
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
 
 training_args = TrainingArguments(
@@ -40,7 +38,7 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_dataset,
+    train_dataset=dataset,
     tokenizer=tokenizer,
     data_collator=data_collator,
 )

@@ -9,14 +9,14 @@ class OPKDataset(Dataset):
     train_files = []
     val_files = []
     split = 'train'
-    root_dir = 'minifier/'
+    root_dir = os.getenv("DATASET_DIR")
+    transform=None
     
 
-    def __init__(self, split='train'):
-        self.root_dir = os.getenv("DATASET_DIR")
+    def __init__(self, transform=None, split='train'):
         self._walk_root_directory()
         self.split = split
-        
+        self.transform = transform
         super().__init__()
 
     def __len__(self):
@@ -27,7 +27,11 @@ class OPKDataset(Dataset):
         original_filepath = minified_filepath.replace("_terser.min.js", ".js") if "_terser" in minified_filepath else minified_filepath.replace("_google.min.js", ".js")
         minified_file_content = open(file=minified_filepath).read()
         original_file_content = open(file=original_filepath).read()
-        return {"input": minified_file_content, "output": original_file_content}
+        result = {"input": minified_file_content, "output": original_file_content}
+        if self.transform:
+            return self.transform(result)
+        else:
+            return result
     
     def _walk_root_directory(self):
         for root, _, files in os.walk(self.root_dir):
@@ -35,5 +39,6 @@ class OPKDataset(Dataset):
                 if ".min.js" in file:
                     self.all_files.append(os.path.join(root, file))
 
-dt = OPKDataset(root_dir="/home/jovyan/outpost-thesis/datasets/minified")
-print(len(dt))
+if __name__ == "__main__":
+    dt = OPKDataset()
+    print(len(dt))

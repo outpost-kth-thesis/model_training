@@ -1,5 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments
-from dataloader import OPKDataset
+from finetuning.dataloader import OPKDataset
 from peft import LoraConfig, get_peft_model
 from torch.utils.data import random_split
 from peft.tuners.lora.config import CordaConfig
