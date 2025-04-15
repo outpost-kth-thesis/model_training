@@ -35,6 +35,7 @@ training_arguments = TrainingArguments(
     logging_steps=25,
     learning_rate=2e-4,
     fp16=True,
+    save_strategy="epoch",
     evaluation_strategy="epoch",
 )
 
@@ -51,5 +52,3 @@ trainer = SFTTrainer(
 
 trainer.train()
 trainer.save_model("./lora-Llama-3.1-8B")
-
-print(tokenizer("hello world how do you do?"))
