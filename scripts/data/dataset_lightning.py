@@ -22,6 +22,7 @@ class OPKDatasetLightning(pl.LightningDataModule):
     def setup(self):
         self.dataset = OPKDatasetPT(transform=format_llama3)
         self.total_len = len(self.dataset)
+        self.val_len = int(0.2 * len(self.dataset))
         self.train_len = self.total_len - self.val_len
         self.train_set, self.val_set = random_split(self.dataset, [self.train_len, self.val_len])
     
