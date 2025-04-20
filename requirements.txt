@@ -3,9 +3,8 @@ vllm
 numpy
 huggingface_hub
 bitsandbytes
-trl
 peft
 accelerate
 transformers
-tokenizers
 python-dotenv
+pytorch_lightning
