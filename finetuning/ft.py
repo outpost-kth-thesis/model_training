@@ -1,11 +1,13 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForSeq2Seq
 from dataloader import OPKDataset
+from peft import LoraConfig
 
-model_name = 'meta-llama/Llama-3.1-8B'
+
+model_name = 'Qwen/Qwen2.5-3B'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, device_map='auto')
+tokenizer.pad_token = tokenizer.eos_token 
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map='auto', load_in_4bit=True)
 
-dataset = OPKDataset()
 
 max_input_length = 512
 max_output_length = 512
@@ -22,6 +24,15 @@ def preprocess(example):
     return model_inputs
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
+
+dataset = OPKDataset(transform=preprocess)
+
+lora_config = LoraConfig(
+    target_modules=["q_proj", "k_proj"],
+    modules_to_save=["lm_head"],
+)
+
+model.add_adapter(lora_config)
 
 training_args = TrainingArguments(
     output_dir="./checkpoints",

@@ -1,10 +1,14 @@
-from torch.utils.data import DataLoader, Dataset
+"""
+Dataloader as a Pytorch Dataset module
+"""
+
+from torch.utils.data import Dataset
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-class OPKDataset(Dataset):
+class OPKDatasetPT(Dataset):
     all_files = []
     train_files = []
     val_files = []
@@ -17,7 +21,6 @@ class OPKDataset(Dataset):
         self._walk_root_directory()
         self.split = split
         self.transform = transform
-        super().__init__()
 
     def __len__(self):
         return len(self.all_files)
@@ -27,11 +30,10 @@ class OPKDataset(Dataset):
         original_filepath = minified_filepath.replace("_terser.min.js", ".js") if "_terser" in minified_filepath else minified_filepath.replace("_google.min.js", ".js")
         minified_file_content = open(file=minified_filepath).read()
         original_file_content = open(file=original_filepath).read()
-        result = {"input": minified_file_content, "output": original_file_content}
         if self.transform:
-            return self.transform(result)
+            return self.transform(minified_file_content, original_file_content)
         else:
-            return result
+            return minified_file_content, original_file_content
     
     def _walk_root_directory(self):
         for root, _, files in os.walk(self.root_dir):
@@ -40,5 +42,5 @@ class OPKDataset(Dataset):
                     self.all_files.append(os.path.join(root, file))
 
 if __name__ == "__main__":
-    dt = OPKDataset()
+    dt = OPKDatasetPT()
     print(len(dt))
