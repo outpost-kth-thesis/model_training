@@ -56,5 +56,5 @@ console.log("more text")
 console.log("more text")
     """
 
-    print(format_llama3(input, output))
+    print(format_llama3(input))
     print(tokenize(input, output))
