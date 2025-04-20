@@ -6,7 +6,7 @@ Transform dataset into a lightning dataset
 from torch.utils.data import DataLoader
 from dotenv import load_dotenv
 import pytorch_lightning as pl
-import tokenization
+import tokenization as tokenization
 import dataset
 from torch.utils.data import random_split, DataLoader
 

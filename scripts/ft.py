@@ -1,8 +1,8 @@
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig
-from data.tokenization import pad_token
-from data.dataset_lightning import OPKDatasetLightning
+from tokenization import pad_token
+from dataset_lightning import OPKDatasetLightning
 from dotenv import load_dotenv
-from data.tokenization import get_tokenizer
+from tokenization import get_tokenizer
 import os
 import torch
 import pytorch_lightning as pl

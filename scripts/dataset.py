@@ -5,7 +5,7 @@ Dataloader as a Pytorch Dataset module
 from torch.utils.data import Dataset
 import os
 from dotenv import load_dotenv
-import tokenization
+import tokenization as tokenization
 
 load_dotenv()
 
