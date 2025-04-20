@@ -17,7 +17,7 @@ load_dotenv()
 
 class OPKDatasetLightning(pl.LightningDataModule):
     def __init__(self):
-        self.batch_size = os.getenv("BATCH_SIZE") if os.getenv("BATCH_SIZE") is not None else 4
+        self.batch_size = int(os.getenv("BATCH_SIZE")) if os.getenv("BATCH_SIZE") is not None else 4
 
     def setup(self):
         self.dataset = OPKDatasetPT(transform=format_llama3)
