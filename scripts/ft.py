@@ -60,6 +60,7 @@ class CausalLM(pl.LightningModule):
 if __name__ == "__main__":
     model = CausalLM()
     dataset = OPKDatasetLightning()
-    trainer = pl.Trainer(max_epochs=3, accelerator='auto', device='auto')
-    trainer.fit(model=model, datamodule=dataset)
+    dataset.setup()
+    trainer = pl.Trainer(max_epochs=3, accelerator='auto')
+    trainer.fit(model=model, datamodule=dataset.train_dataloader())
 
