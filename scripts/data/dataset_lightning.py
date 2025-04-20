@@ -5,10 +5,9 @@ Transform dataset into a lightning dataset
 
 from torch.utils.data import DataLoader
 from dotenv import load_dotenv
-import os
 import pytorch_lightning as pl
-from tokenization import tokenize
-from dataset import OPKDatasetPT
+import tokenization
+import dataset
 from torch.utils.data import random_split, DataLoader
 
 
@@ -20,7 +19,7 @@ class OPKDatasetLightning(pl.LightningDataModule):
         self.batch_size = 1
 
     def setup(self):
-        self.dataset = OPKDatasetPT(transform=tokenize)
+        self.dataset = dataset.OPKDatasetPT(transform=tokenization.tokenize)
         self.total_len = len(self.dataset)
         self.val_len = int(0.2 * len(self.dataset))
         self.train_len = self.total_len - self.val_len
