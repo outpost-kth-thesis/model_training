@@ -3,6 +3,8 @@ from tokenization import pad_token
 from dataset_lightning import OPKDatasetLightning
 from dotenv import load_dotenv
 from tokenization import get_tokenizer
+from dataset import OPKDatasetPT
+from torch.utils.data import DataLoader
 import os
 import torch
 import pytorch_lightning as pl
@@ -59,7 +61,8 @@ class CausalLM(pl.LightningModule):
 
 if __name__ == "__main__":
     model = CausalLM()
-    dataset = OPKDatasetLightning()
+    dataset = OPKDatasetPT()
+    dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
     dataset.setup()
     trainer = pl.Trainer(max_epochs=3, accelerator='auto')
     trainer.fit(model=model, datamodule=dataset.train_dataloader())
