@@ -5,6 +5,7 @@ Dataloader as a Pytorch Dataset module
 from torch.utils.data import Dataset
 import os
 from dotenv import load_dotenv
+from tokenization import get_tokenizer
 
 load_dotenv()
 
@@ -31,7 +32,9 @@ class OPKDatasetPT(Dataset):
         minified_file_content = open(file=minified_filepath).read()
         original_file_content = open(file=original_filepath).read()
         if self.transform:
-            return self.transform(minified_file_content, original_file_content)
+            tokenized = self.transform(minified_file_content, original_file_content)
+            tokenized = {k: v.squeeze(0, 1) for k, v in tokenized.items()}
+            return tokenized
         else:
             return minified_file_content, original_file_content
     
@@ -42,5 +45,5 @@ class OPKDatasetPT(Dataset):
                     self.all_files.append(os.path.join(root, file))
 
 if __name__ == "__main__":
-    dt = OPKDatasetPT()
-    print(len(dt))
+    dt = OPKDatasetPT(transform=get_tokenizer())
+    print(dt.__getitem__(1))

@@ -14,8 +14,8 @@ class CausalLM(pl.LightningModule):
         self.save_hyperparameters()
         self.model_name = os.getenv("MODEL_NAME")
 
-    def forward(self, input_ids):
-        self.model(input_ids)
+    def forward(self, input_ids, attention_mask, labels):
+        self.model(input_ids, attention_mask, labels)
 
     def training_step(self, batch, batch_idx):
         output = self(**batch)

@@ -15,7 +15,7 @@ _system_prompts = [
 def tokenize(input, output, max_length=1028, truncation=False, padding="longest"):
     formatted_prompt = format_llama3(input=input)
     tokenizer = get_tokenizer()
-    return tokenizer(formatted_prompt, text_target=output, padding=padding, max_length=max_length, truncation=truncation)
+    return tokenizer(formatted_prompt, text_target=output, padding=padding, max_length=max_length, truncation=truncation, return_tensors="pt")
 
 def get_tokenizer():
     _tokenizer = AutoTokenizer.from_pretrained(os.getenv("MODEL_NAME"))
