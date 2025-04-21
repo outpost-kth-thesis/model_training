@@ -12,7 +12,7 @@ _system_prompts = [
     "Act as a JavaScript expert who can expertly read minified code, but respond only using plain JavaScript, without any added context or commentary."
 ]
 
-def tokenize(input, output, max_length=1028, truncation=False, padding="longest"):
+def tokenize(input, output, max_length=1028, truncation=True, padding="max_length"):
     formatted_prompt = format_llama3(input=input)
     tokenizer = get_tokenizer()
     return tokenizer(formatted_prompt, text_target=output, padding=padding, max_length=max_length, truncation=truncation, return_tensors="pt")
