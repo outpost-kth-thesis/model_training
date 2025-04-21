@@ -2,7 +2,7 @@
 Dataloader as a Pytorch Dataset module
 """
 
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 import os
 from dotenv import load_dotenv
 import tokenization as tokenization
@@ -45,5 +45,6 @@ class OPKDatasetPT(Dataset):
                     self.all_files.append(os.path.join(root, file))
 
 if __name__ == "__main__":
-    dt = OPKDatasetPT(transform=tokenization.get_tokenizer())
-    print(dt.__getitem__(1))
+    dataset = OPKDatasetPT(transform=tokenization.tokenize)
+    item = dataset.__getitem__(1)
+    print(item["input_ids"])

@@ -1,8 +1,7 @@
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig
 from tokenization import pad_token
-from dataset_lightning import OPKDatasetLightning
 from dotenv import load_dotenv
-from tokenization import get_tokenizer
+from tokenization import get_tokenizer, tokenize
 from dataset import OPKDatasetPT
 from torch.utils.data import DataLoader
 import os
@@ -36,7 +35,10 @@ class CausalLM(pl.LightningModule):
         )
 
     def training_step(self, batch, batch_idx):
-        output = self(**batch)
+        input_ids = batch["input_ids"]
+        attn_mask = batch["attention_mask"]
+        labels = batch["labels"]
+        output = self(input_ids, attn_mask, labels)
         loss = output.loss
         self.log("train_loss", loss, prog_bar=True)
         return loss
@@ -61,9 +63,8 @@ class CausalLM(pl.LightningModule):
 
 if __name__ == "__main__":
     model = CausalLM()
-    dataset = OPKDatasetPT()
+    dataset = OPKDatasetPT(transform=tokenize)
     dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
-    dataset.setup()
     trainer = pl.Trainer(max_epochs=3, accelerator='auto')
-    trainer.fit(model=model, datamodule=dataset.train_dataloader())
+    trainer.fit(model, dataset)
 
