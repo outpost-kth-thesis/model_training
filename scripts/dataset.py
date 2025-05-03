@@ -33,7 +33,7 @@ class OPKDatasetPT(Dataset):
         original_file_content = open(file=original_filepath).read()
         if self.transform:
             tokenized = self.transform(minified_file_content, original_file_content)
-            tokenized = {k: v.squeeze(0, 1) for k, v in tokenized.items()}
+            # tokenized = {k: v.squeeze(0, 1) for k, v in tokenized.items()}
             return tokenized
         else:
             return minified_file_content, original_file_content

@@ -24,7 +24,7 @@ class CausalLM(pl.LightningModule):
         )
 
         self.model = AutoModelForCausalLM.from_pretrained(self.model_name, quantization_config=quantization_config)
-        self.model.resize_token_embeddings(len(get_tokenizer()))
+        # self.model.resize_token_embeddings(len(get_tokenizer()))
         self.model.config.pad_token = pad_token
 
     def forward(self, input_ids, attention_mask, labels):        
@@ -40,6 +40,7 @@ class CausalLM(pl.LightningModule):
         labels = batch["labels"]
         output = self(input_ids, attn_mask, labels)
         loss = output.loss
+        # print("getting loss", loss)
         self.log("train_loss", loss, prog_bar=True)
         return loss
     
@@ -64,7 +65,7 @@ class CausalLM(pl.LightningModule):
 if __name__ == "__main__":
     model = CausalLM()
     dataset = OPKDatasetPT(transform=tokenize)
-    dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True)
-    trainer = pl.Trainer(max_epochs=3, accelerator='auto')
+    dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
+    trainer = pl.Trainer(max_epochs=3, accelerator='gpu')
     trainer.fit(model, dataset)
 
