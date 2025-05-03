@@ -1,4 +1,3 @@
-torch
 vllm
 numpy
 huggingface_hub
