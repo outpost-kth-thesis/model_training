@@ -23,7 +23,7 @@ class CausalLM(pl.LightningModule):
             bnb_4bit_use_double_quant=True,
         )
 
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name, quantization_config=quantization_config)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
         # self.model.resize_token_embeddings(len(get_tokenizer()))
         self.model.config.pad_token = pad_token
 
