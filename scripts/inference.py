@@ -1,8 +1,8 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
 import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Load tokenizer and model (adjust path to local directory or model hub name)
-model_name = "meta-llama/Llama-3.1-8B"
+# Load model and tokenizer
+model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -10,13 +10,40 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="auto"
 )
 
-# Define system and user prompts (ChatML format)
-def format_chat(system_prompt, user_prompt):
-    return f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|>" \
-           f"<|start_header_id|>user<|end_header_id|>\n{user_prompt}<|eot_id|>" \
-           f"<|start_header_id|>assistant<|end_header_id|>\n"
+# Prompt formatting (ChatML-style)
+def format_prompt(system_prompt, user_prompt):
+    return (
+        "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n" + system_prompt + "<|eot_id|>" +
+        "<|start_header_id|>user<|end_header_id|>\n" + user_prompt + "<|eot_id|>" +
+        "<|start_header_id|>assistant<|end_header_id|>\n"
+    )
 
-# Example usage
+# Generate response
+def chat(system_prompt, user_prompt):
+    prompt = format_prompt(system_prompt, user_prompt)
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+
+    eos_token_id = tokenizer.eos_token_id
+    output = model.generate(
+        **inputs,
+        do_sample=True,
+        temperature=0.7,
+        top_p=0.9,
+        eos_token_id=eos_token_id,
+        max_new_tokens=4096  # high enough to avoid artificial cutoff
+    )
+
+    output_text = tokenizer.decode(output[0], skip_special_tokens=True)
+    # Get the text after the assistant prompt
+    assistant_start = output_text.find(user_prompt) + len(user_prompt)
+    assistant_response = output_text[assistant_start:].strip()
+
+    print("\n--- Generated Text ---")
+    print(assistant_response)
+    print("----------------------\n")
+    return assistant_response
+
+
 system_prompt = """
 You are really good at filling out forms online. You are given the input as a list, you return the output as JSON.
 When given a list of HTML elements, you are able provide an appropriate input for each of them. If you cannot, you set the status for the tag to be "NEED_INFO".
@@ -45,9 +72,6 @@ Element HTML:
 Element HTML:
 <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
 """
-input_text = format_chat(system_prompt, user_prompt)
-
-# Tokenize and generate
-inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
-streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-_ = model.generate(**inputs, streamer=streamer, max_new_tokens=100)
+# Example usage
+if __name__ == "__main__":
+    chat(system_prompt, user_prompt)
