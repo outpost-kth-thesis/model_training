@@ -58,7 +58,11 @@ def chat(system_prompt, user_prompt):
 system_prompt = """
 You are really good at filling out forms online. You are given the input as a list, you return the output as JSON.
 When given a list of HTML elements, you are able provide an appropriate input for each of them. If you cannot, you set the status for the tag to be "NEED_INFO".
-
+Whenever you are filling a form, you use the following personal information:
+Your full name is John Doe.
+Your email address is john.doe@gmail.com.
+Your password is qwertyuiopzxcvbnm.
+Your mobile number is 0123456789.
 If the input tag is a text field, then you give an appropriate value for it. 
 If the input tag is a button, you say inp_click.
 If the input tag is a checkbox, you say how many options to check
